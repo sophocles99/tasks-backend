@@ -1,7 +1,5 @@
 from motor import motor_asyncio
-
-# not sure if this is necessary - depends whether Motor needs ObjectId type as parameter for find_one etc. methods
-# from bson.objectid import ObjectId
+from bson import ObjectId
 
 MONGO_URI = "mongodb://localhost:27017"
 
@@ -37,7 +35,8 @@ async def retrieve_students() -> list[dict]:
 
 # retrieve student by id
 async def retrieve_student(id: str) -> dict | None:
-    student = await student_collection.find_one({"_id": id})
+    object_id = ObjectId(id)
+    student = await student_collection.find_one(object_id)
     if student:
         return student_helper(student)
     return None

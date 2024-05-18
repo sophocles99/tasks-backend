@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, model_validator
 
 
 class Student(BaseModel):
@@ -20,14 +20,25 @@ class Student(BaseModel):
         }
 
 
-class UpdateStudent(BaseModel):
-    fullname: str | None
-    email: EmailStr | None
-    course_of_study: str | None
-    year: int | None
-    gpa: float | None
+class StudentUpdate(BaseModel):
+    fullname: str | None = None
+    email: EmailStr | None = None
+    course_of_study: str | None = None
+    year: int | None = None
+    gpa: float | None = None
+
+    @model_validator(mode="before")
+    def at_least_one_field(cls, data):
+        data_fields = data.keys()
+        model_fields = cls.model_fields.keys()
+        if not any(map(lambda field: field in model_fields, data_fields)):
+            raise ValueError(
+                f"at least one of the following fields is required: {", ".join(list(model_fields))}"
+            )
+        return data
 
     class Config:
+        extra = "forbid"
         schema_extra = {
             "example": {
                 "fullname": "John Doe",
