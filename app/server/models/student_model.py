@@ -39,9 +39,5 @@ class UpdateStudent(BaseModel):
         }
 
 
-def CreateResponse(data, message):
-    return {"data": [data], "code": 200, "message": message}
-
-
 def CreateErrorResponse(error, code, message):
     return {"error": error, "code": code, "message": message}

@@ -37,7 +37,7 @@ async def retrieve_students() -> list[dict]:
 
 # retrieve student by id
 async def retrieve_student(id: str) -> dict | None:
-    student = await student_collection.find({"_id": id})
+    student = await student_collection.find_one({"_id": id})
     if student:
         return student_helper(student)
     return None
