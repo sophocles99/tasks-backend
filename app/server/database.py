@@ -23,10 +23,10 @@ def student_helper(student) -> dict:
 
 
 # create student
-async def create_student(student_data: dict) -> dict | None:
-    insert_one_result = await student_collection.insert_one(student_data)
-    student = await student_collection.find_one(insert_one_result.inserted_id)
-    return student_helper(student)
+async def create_student(student: dict) -> dict | None:
+    insert_one_result = await student_collection.insert_one(student)
+    new_student = await student_collection.find_one(insert_one_result.inserted_id)
+    return student_helper(new_student)
 
 
 # retrieve all students

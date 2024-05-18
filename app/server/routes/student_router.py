@@ -14,8 +14,8 @@ from server.models.student_model import (
 router = APIRouter()
 
 
-@router.post("/", response_description="Student data added into the database")
+@router.post("/", response_description="Student added into the database")
 async def post_student(student: Student):
-    # student = jsonable_encoder(student)
-    new_student = await create_student(student)
+    student_dict = student.model_dump()
+    new_student = await create_student(student_dict)
     return CreateResponse(new_student, "Student added successfully.")
