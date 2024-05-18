@@ -1,12 +1,10 @@
-from typing import Optional
-
 from pydantic import BaseModel, EmailStr, Field
 
 
-class StudentSchema(BaseModel):
-    fullname: str = Field(...)
-    email: EmailStr = Field(...)
-    course_of_study: str = Field(...)
+class Student(BaseModel):
+    fullname: str
+    email: EmailStr
+    course_of_study: str
     year: int = Field(..., gt=0, lt=9)
     gpa: float = Field(..., gt=0.0, le=4.0)
 
@@ -22,12 +20,12 @@ class StudentSchema(BaseModel):
         }
 
 
-class UpdateStudentModel(BaseModel):
-    fullname: Optional[str]
-    email: Optional[EmailStr]
-    course_of_study: Optional[str]
-    year: Optional[int]
-    gpa: Optional[float]
+class UpdateStudent(BaseModel):
+    fullname: str | None
+    email: EmailStr | None
+    course_of_study: str | None
+    year: int | None
+    gpa: float | None
 
     class Config:
         schema_extra = {
@@ -41,9 +39,9 @@ class UpdateStudentModel(BaseModel):
         }
 
 
-def ResponseModel(data, message):
+def CreateResponse(data, message):
     return {"data": [data], "code": 200, "message": message}
 
 
-def ErrorResponseModel(error, code, message):
+def CreateErrorResponse(error, code, message):
     return {"error": error, "code": code, "message": message}

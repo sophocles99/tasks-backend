@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from server.routes.student import router as StudentRouter
+from server.routes.student_router import router as StudentRouter
 
 app = FastAPI()
 app.include_router(StudentRouter, tags=["Student"], prefix="/student")
