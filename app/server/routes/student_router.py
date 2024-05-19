@@ -25,7 +25,7 @@ async def get_student(id: str):
     return student
 
 
-@router.post("/", response_description="Student added into database")
+@router.post("/", response_description="Student added into database", status_code=201)
 async def post_student(student: Student):
     student_dict = student.model_dump()
     new_student = await create_student(student_dict)
@@ -39,7 +39,7 @@ async def patch_student(id: str, student_update: StudentUpdate):
     return updated_student
 
 
-@router.delete("/{id}", response_description="Student deleted")
+@router.delete("/{id}", response_description="Student deleted", status_code=204)
 async def delete_student(id: str):
     delete_success = await remove_student(id)
     if not delete_success:
