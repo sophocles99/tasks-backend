@@ -9,13 +9,29 @@ class Student(BaseModel):
     gpa: float = Field(..., gt=0.0, le=4.0)
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
-                "fullname": "John Doe",
-                "email": "jdoe@x.edu.ng",
                 "course_of_study": "Water resources engineering",
-                "year": 2,
+                "email": "jdoe@x.edu.ng",
+                "fullname": "John Doe",
                 "gpa": "3.0",
+                "year": 2,
+            }
+        }
+
+
+class StudentWithId(Student):
+    id: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "664a1956ba41751e455e7042",
+                "course_of_study": "Water resources engineering",
+                "email": "jdoe@x.edu.ng",
+                "fullname": "John Doe",
+                "gpa": "3.0",
+                "year": 2,
             }
         }
 
@@ -39,13 +55,10 @@ class StudentUpdate(BaseModel):
 
     class Config:
         extra = "forbid"
-        schema_extra = {
+        json_schema_extra = {
             "example": {
-                "fullname": "John Doe",
-                "email": "jdoe@x.edu.ng",
                 "course_of_study": "Water resources and environmental engineering",
-                "year": 4,
-                "gpa": "4.0",
+                "year": 3,
             }
         }
 
