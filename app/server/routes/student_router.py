@@ -1,14 +1,12 @@
 from fastapi import APIRouter, HTTPException
-
 from server.database import (
-    retrieve_students,
-    retrieve_student,
     create_student,
+    remove_student,
+    retrieve_student,
+    retrieve_students,
     update_student,
-    delete_student,
 )
-
-from server.models.student_model import Student, StudentUpdate  # CreateErrorResponse,
+from server.models.student_model import Student, StudentUpdate
 
 router = APIRouter()
 
@@ -39,3 +37,11 @@ async def patch_student(id: str, student_update: StudentUpdate):
     update_dict = {k: v for k, v in student_update if v is not None}
     updated_student = await update_student(id, update_dict)
     return updated_student
+
+
+@router.delete("/{id}", response_description="Student deleted")
+async def delete_student(id: str):
+    delete_success = await remove_student(id)
+    if not delete_success:
+        raise HTTPException(status_code=404, detail="No student found with that id")
+    return None

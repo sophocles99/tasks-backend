@@ -1,5 +1,5 @@
-from motor import motor_asyncio
 from bson import ObjectId
+from motor import motor_asyncio
 
 MONGO_URI = "mongodb://localhost:27017"
 
@@ -35,8 +35,7 @@ async def retrieve_students() -> list[dict]:
 
 # retrieve student by id
 async def retrieve_student(id: str) -> dict | None:
-    object_id = ObjectId(id)
-    student = await student_collection.find_one({"_id": object_id})
+    student = await student_collection.find_one({"_id": ObjectId(id)})
     if student:
         return student_helper(student)
     return None
@@ -44,16 +43,15 @@ async def retrieve_student(id: str) -> dict | None:
 
 # update a student by id
 async def update_student(id: str, update_dict: dict) -> dict | None:
-    object_id = ObjectId(id)
     updated_student = await student_collection.find_one_and_update(
-        {"_id": object_id}, {"$set": update_dict}, return_document=True
+        {"_id": ObjectId(id)}, {"$set": update_dict}, return_document=True
     )
     return student_helper(updated_student)
 
 
 # delete a student by id
-async def delete_student(id: str) -> dict | None:
-    student = student_collection.find_one_and_delete({"_id": id})
+async def remove_student(id: str) -> dict | None:
+    student = student_collection.find_one_and_delete({"_id": ObjectId(id)})
     if student:
-        return student_helper(student)
-    return None
+        return True
+    return False
