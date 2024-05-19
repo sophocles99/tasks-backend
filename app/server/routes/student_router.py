@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException
 
 from server.database import (
-    create_student,
-    delete_student,
-    retrieve_student,
     retrieve_students,
+    retrieve_student,
+    create_student,
     update_student,
+    delete_student,
 )
 
 from server.models.student_model import Student, StudentUpdate  # CreateErrorResponse,
@@ -36,4 +36,6 @@ async def post_student(student: Student):
 
 @router.patch("/{id}", response_description="Student updated")
 async def patch_student(id: str, student_update: StudentUpdate):
-    print(f"from the path operation function: {student_update}")
+    update_dict = {k: v for k, v in student_update if v is not None}
+    updated_student = await update_student(id, update_dict)
+    return updated_student

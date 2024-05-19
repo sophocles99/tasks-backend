@@ -36,19 +36,19 @@ async def retrieve_students() -> list[dict]:
 # retrieve student by id
 async def retrieve_student(id: str) -> dict | None:
     object_id = ObjectId(id)
-    student = await student_collection.find_one(object_id)
+    student = await student_collection.find_one({"_id": object_id})
     if student:
         return student_helper(student)
     return None
 
 
 # update a student by id
-async def update_student(id: str, data: dict) -> dict | None:
-    # return False if an empty data dict is sent
-    if len(data) == 0:
-        return None
-    student = await student_collection.find_one_and_update({"_id": id}, {"$set": data})
-    return student_helper(student)
+async def update_student(id: str, update_dict: dict) -> dict | None:
+    object_id = ObjectId(id)
+    updated_student = await student_collection.find_one_and_update(
+        {"_id": object_id}, {"$set": update_dict}, return_document=True
+    )
+    return student_helper(updated_student)
 
 
 # delete a student by id
