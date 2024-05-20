@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, model_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
 
 
 class Student(BaseModel):
@@ -8,7 +8,7 @@ class Student(BaseModel):
     year: int = Field(..., gt=0, lt=9)
     gpa: float = Field(..., gt=0.0, le=4.0)
 
-    class Config:
+    model_config = ConfigDict(
         json_schema_extra = {
             "example": {
                 "course_of_study": "Water resources engineering",
@@ -18,12 +18,13 @@ class Student(BaseModel):
                 "year": 2,
             }
         }
+    )
 
 
 class StudentWithId(Student):
     id: str
 
-    class Config:
+    model_config = ConfigDict(
         json_schema_extra = {
             "example": {
                 "id": "664a1956ba41751e455e7042",
@@ -34,6 +35,7 @@ class StudentWithId(Student):
                 "year": 2,
             }
         }
+    )
 
 
 class StudentUpdate(BaseModel):
@@ -53,14 +55,15 @@ class StudentUpdate(BaseModel):
             )
         return data
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(
+        extra = "forbid",
         json_schema_extra = {
             "example": {
                 "course_of_study": "Water resources and environmental engineering",
                 "year": 3,
             }
         }
+    )
 
 
 def CreateErrorResponse(error, code, message):
