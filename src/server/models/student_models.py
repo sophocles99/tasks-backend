@@ -1,15 +1,16 @@
 from bson import ObjectId
 from server.database import student_collection
 
+
 # helper
 def student_helper(student) -> dict:
     return {
-        "id": str(student["_id"]),
-        "fullname": student["fullname"],
-        "email": student["email"],
         "course_of_study": student["course_of_study"],
-        "year": student["year"],
+        "email": student["email"],
+        "fullname": student["fullname"],
         "gpa": student["gpa"],
+        "id": str(student["_id"]),
+        "year": student["year"],
     }
 
 

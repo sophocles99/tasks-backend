@@ -9,7 +9,7 @@ class Student(BaseModel):
     gpa: float = Field(..., gt=0.0, le=4.0)
 
     model_config = ConfigDict(
-        json_schema_extra = {
+        json_schema_extra={
             "example": {
                 "course_of_study": "Water resources engineering",
                 "email": "jdoe@x.edu.ng",
@@ -25,7 +25,7 @@ class StudentWithId(Student):
     id: str
 
     model_config = ConfigDict(
-        json_schema_extra = {
+        json_schema_extra={
             "example": {
                 "id": "664a1956ba41751e455e7042",
                 "course_of_study": "Water resources engineering",
@@ -56,8 +56,8 @@ class StudentUpdate(BaseModel):
         return data
 
     model_config = ConfigDict(
-        extra = "forbid",
-        json_schema_extra = {
+        extra="forbid",
+        json_schema_extra={
             "example": {
                 "course_of_study": "Water resources and environmental engineering",
                 "year": 3,
