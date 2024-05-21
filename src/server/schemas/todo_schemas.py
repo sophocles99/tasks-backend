@@ -4,6 +4,7 @@ from typing import Literal
 
 
 class Todo(BaseModel):
+    _id: str | None  # TODO Add validation that this is a MongoDB ObjectId if present
     title: str
     description: str
     status: Literal['done', 'not done', 'in progress']
