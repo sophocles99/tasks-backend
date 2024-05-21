@@ -1,5 +1,5 @@
 from bson import ObjectId
-from backend.src.server.schemas.todo_schemas import Todo
+from server.schemas.todo_schemas import Todo
 from server.database import todo_collection
 
 
@@ -25,9 +25,9 @@ async def retrieve_todo(id: str) -> Todo | None:
 
 
 # update a student by id
-async def update_todo(id: str, update_dict: dict) -> Todo | None:
+async def update_todo(id: str, todo_update: dict) -> Todo | None:
     updated_todo = await todo_collection.find_one_and_update(
-        {"_id": ObjectId(id)}, {"$set": update_dict}, return_document=True
+        {"_id": ObjectId(id)}, {"$set": todo_update}, return_document=True
     )
     return updated_todo
 
