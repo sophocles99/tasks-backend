@@ -6,34 +6,53 @@ from server.models.todo_models import (
     retrieve_todos,
     update_todo,
 )
-from server.schemas.todo_schemas import Todo, TodoUpdate
+from server.schemas.todo_schemas import ObjectIdStr, TodoIn, TodoOut, TodoUpdate
 
 todo_router = APIRouter()
 
 
-@todo_router.get("/", response_description="Todos retrieved from database")
-async def get_todos() -> list[Todo]:
+@todo_router.get(
+    "/",
+    response_description="Todos retrieved from database",
+    response_model_by_alias=False,
+)
+async def get_todos() -> list[TodoOut]:
     todos = await retrieve_todos()
     return todos
 
 
-@todo_router.get("/{id}", response_description="Todo retrieved from database")
-async def get_todo(id: str) -> Todo:
+@todo_router.get(
+    "/{id}",
+    response_description="Todo retrieved from database",
+    response_model_by_alias=False,
+)
+async def get_todo(id: ObjectIdStr) -> TodoOut:
     todo = await retrieve_todo(id)
     if not todo:
         raise HTTPException(status_code=404, detail="No todo found with that id")
+    print(TodoOut(**todo))
     return todo
 
 
-@todo_router.post("/", response_description="Todo added into database", status_code=201)
-async def post_todo(todo: Todo) -> Todo:
+@todo_router.post(
+    "/",
+    response_description="Todo added into database",
+    response_model_by_alias=False,
+    status_code=201,
+)
+async def post_todo(todo: TodoIn) -> TodoOut:
     todo_dict = todo.model_dump()
     new_todo = await create_todo(todo_dict)
     return new_todo
 
 
-@todo_router.patch("/{id}", response_description="Todo updated")
-async def patch_todo(id: str, todo_update: TodoUpdate) -> Todo:
+@todo_router.patch(
+    "/{id}", response_description="Todo updated", response_model_by_alias=False
+)
+async def patch_todo(id: str, todo_update: TodoUpdate) -> TodoOut:
+    print(todo_update)
+    for k, v in todo_update:
+        print(k, v)
     todo_update_dict = {k: v for k, v in todo_update if v is not None}
     updated_todo = await update_todo(id, todo_update_dict)
     return updated_todo
