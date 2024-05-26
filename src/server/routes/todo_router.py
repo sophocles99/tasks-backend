@@ -30,7 +30,6 @@ async def get_todo(id: ObjectIdStr) -> TodoOut:
     todo = await retrieve_todo(id)
     if not todo:
         raise HTTPException(status_code=404, detail="No todo found with that id")
-    print(TodoOut(**todo))
     return todo
 
 
@@ -50,9 +49,6 @@ async def post_todo(todo: TodoIn) -> TodoOut:
     "/{id}", response_description="Todo updated", response_model_by_alias=False
 )
 async def patch_todo(id: str, todo_update: TodoUpdate) -> TodoOut:
-    print(todo_update)
-    for k, v in todo_update:
-        print(k, v)
     todo_update_dict = {k: v for k, v in todo_update if v is not None}
     updated_todo = await update_todo(id, todo_update_dict)
     return updated_todo

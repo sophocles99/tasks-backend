@@ -1,6 +1,6 @@
 from bson import ObjectId
 from datetime import datetime
-from pydantic import BaseModel, BeforeValidator, Field
+from pydantic import BaseModel, BeforeValidator, Field, model_validator
 from typing import Annotated, Literal
 
 
@@ -27,3 +27,13 @@ class TodoUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     status: Literal["done", "not done", "in progress"] | None = None
+
+    @model_validator(mode="before")
+    def at_least_one_field(cls, data):
+        data_fields = data.keys()
+        model_fields = cls.model_fields.keys()
+        if not any(map(lambda field: field in model_fields, data_fields)):
+            raise ValueError(
+                f"at least one of the following fields is required: {", ".join(list(model_fields))}"
+            )
+        return data
