@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from server.routes.student_router import student_router
-from server.routes.todo_router import todo_router
-
+from server.routes.task_router import task_router
 
 app = FastAPI()
 
@@ -22,9 +21,9 @@ app.add_middleware(
 )
 
 app.include_router(student_router, tags=["students"], prefix="/students")
-app.include_router(todo_router, tags=["todos"], prefix="/todos")
+app.include_router(task_router, tags=["tasks"], prefix="/tasks")
 
 
 @app.get("/", tags=["Root"])
 async def read_root():
-    return {"message": "Welcome to the todo app"}
+    return {"message": "Welcome to the task app"}

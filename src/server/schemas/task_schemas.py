@@ -1,7 +1,8 @@
-from bson import ObjectId
 from datetime import datetime
-from pydantic import BaseModel, BeforeValidator, Field, model_validator
 from typing import Annotated, Literal
+
+from bson import ObjectId
+from pydantic import BaseModel, BeforeValidator, Field, model_validator
 
 
 def validate_object_id(value: str | ObjectId) -> str:
@@ -12,18 +13,18 @@ def validate_object_id(value: str | ObjectId) -> str:
 ObjectIdStr = Annotated[str, BeforeValidator(validate_object_id)]
 
 
-class TodoIn(BaseModel):
+class TaskIn(BaseModel):
     title: str
     description: str
     status: Literal["done", "not done", "in progress"] = "not done"
 
 
-class TodoOut(TodoIn):
+class TaskOut(TaskIn):
     created_at: datetime
     id: ObjectIdStr = Field(alias="_id")
 
 
-class TodoUpdate(BaseModel):
+class TaskUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     status: Literal["done", "not done", "in progress"] | None = None
