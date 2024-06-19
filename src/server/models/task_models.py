@@ -6,6 +6,7 @@ from server.database import task_collection
 
 # create student
 async def create_task(task: dict) -> dict | None:
+    task["status"] = "not done"
     task["created_at"] = datetime.now()
     insert_task_result = await task_collection.insert_one(task)
     new_task = await task_collection.find_one(insert_task_result.inserted_id)

@@ -16,10 +16,10 @@ ObjectIdStr = Annotated[str, BeforeValidator(validate_object_id)]
 class TaskIn(BaseModel):
     title: str
     description: str
-    status: Literal["done", "not done", "in progress"] = "not done"
 
 
 class TaskOut(TaskIn):
+    status: Literal["done", "not done", "in progress"]
     created_at: datetime
     id: ObjectIdStr = Field(alias="_id")
 
