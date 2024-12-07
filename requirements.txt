@@ -1,1 +1,4 @@
-fastapi
+fastapi[standard]
+psycopg2
+python-dotenv
+sqlmodel
