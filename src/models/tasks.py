@@ -11,16 +11,10 @@ class TaskStatus(Enum):
     not_done = "not_done"
 
 
-print("Defining TaskCreate")
-
-
 class TaskCreate(SQLModel):
     name: str
     description: str | None = None
     due_date: date | None = None
-
-
-print("Defining Task")
 
 
 class Task(TaskCreate, table=True):

@@ -11,5 +11,6 @@ if not db_url:
 
 engine = create_engine(db_url, echo=True)
 
+
 def create_tables():
     SQLModel.metadata.create_all(engine)
