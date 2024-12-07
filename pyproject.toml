@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tasks-backend"
+version = "0.1.0"
+description = "Backend server for tasks app using FastAPI and SQLModel"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.115.6",
+    "psycopg2>=2.9.10",
+    "python-dotenv>=1.0.1",
+    "sqlmodel>=0.0.22"
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.8.2"]
