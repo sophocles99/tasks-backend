@@ -1,3 +1,3 @@
-from .tasks import Task, TaskCreate
+from .tasks import Task, TaskCreate, TaskPublic
 
-__all__ = ["Task", "TaskCreate"]
+__all__ = ["Task", "TaskCreate", "TaskPublic"]
