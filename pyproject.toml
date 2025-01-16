@@ -21,4 +21,4 @@ dev = [
 ]
 
 [project.scripts]
-run = "tasks_backend.main:main"
+run-dev = "tasks_backend.main:main"

@@ -4,8 +4,6 @@ from enum import Enum
 from sqlmodel import Field, SQLModel
 from tasks_backend.utils.get_current_utc_time import get_current_utc_time
 
-print("Creating Task models...")
-
 
 class Status(Enum):
     NOT_STARTED = "not_started"
@@ -36,4 +34,9 @@ class TaskPublic(TaskBase):
     created_at: datetime
     updated_at: datetime
 
-print("Task models created")
+
+class TaskUpdate(SQLModel):
+    name: str | None = Field(default=None, min_length=3, max_length=50)
+    description: str | None = Field(default=None, max_length=500)
+    due_date: date | None = None
+    status: Status | None = None
