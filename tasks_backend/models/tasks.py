@@ -2,6 +2,7 @@ from datetime import date, datetime
 from enum import Enum
 
 from sqlmodel import Field, SQLModel
+
 from tasks_backend.utils.get_current_utc_time import get_current_utc_time
 
 
