@@ -16,11 +16,12 @@ class TaskBase(SQLModel):
     name: str = Field(min_length=3, max_length=50)
     description: str | None = Field(default=None, max_length=500)
     due_date: date | None = None
+    status: Status = Field(default=Status.NOT_STARTED)
 
 
 class Task(TaskBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    status: Status = Field(default=Status.NOT_STARTED)
+    user_id: int = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=get_current_utc_time)
     updated_at: datetime = Field(default_factory=get_current_utc_time)
 
@@ -31,6 +32,7 @@ class TaskCreate(TaskBase):
 
 class TaskPublic(TaskBase):
     id: int
+    user_id: int
     status: Status
     created_at: datetime
     updated_at: datetime
