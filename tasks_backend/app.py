@@ -79,9 +79,9 @@ def delete_task(task_id: int, session: SessionDependency):
 
 @app.post("/users", response_model=UserPublic)
 def create_user(user_create: UserCreate, session: SessionDependency):
-    new_user = User.model_validate(user_create)
+    new_user = User(**user_create.model_dump())
     existing_user = session.exec(
-        select(User).where(User.email == user_create.email)
+        select(User).where(User.email == new_user.email)
     ).first()
     if existing_user:
         raise HTTPException(
