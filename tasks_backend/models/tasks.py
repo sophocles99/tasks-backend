@@ -3,7 +3,7 @@ from enum import Enum
 
 from sqlmodel import Field, SQLModel
 
-from tasks_backend.utils.get_current_utc_time import get_current_utc_time
+from tasks_backend.utils.utils import get_current_utc_time
 
 
 class Status(Enum):
@@ -23,7 +23,11 @@ class Task(TaskBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=get_current_utc_time)
-    updated_at: datetime = Field(default_factory=get_current_utc_time)
+    updated_at: datetime
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.updated_at = self.created_at
 
 
 class TaskCreate(TaskBase):

@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel
 
-from tasks_backend.utils.get_current_utc_time import get_current_utc_time
+from tasks_backend.utils.utils import get_current_utc_time
 
 
 class UserBase(SQLModel):
@@ -22,7 +22,6 @@ class User(UserBase, table=True):
     def __init__(self, **data):
         super().__init__(**data)
         self.updated_at = self.created_at
-        print(f"init - self.updated_at: {self.updated_at}")
 
 
 class UserCreate(UserBase):
