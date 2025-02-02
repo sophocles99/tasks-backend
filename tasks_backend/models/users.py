@@ -14,10 +14,11 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
+    email: EmailStr = Field(unique=True)
+    hashed_password: bytes = Field(max_length=60)
     created_at: datetime = Field(default_factory=get_current_utc_time)
     updated_at: datetime
     last_login_at: datetime | None = None
-    email: EmailStr = Field(unique=True)
 
     def __init__(self, **data):
         super().__init__(**data)

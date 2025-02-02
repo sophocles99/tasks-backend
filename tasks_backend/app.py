@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import Generator
 
+import bcrypt
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlmodel import Session, select
 
@@ -26,14 +27,15 @@ app = FastAPI(lifespan=lifespan)
 
 @app.post("/users", response_model=UserPublic)
 def create_user(user_create: UserCreate, session: Session = Depends(get_session)):
-    new_user = User(**user_create.model_dump())
-    existing_user = session.exec(select(User).where(User.email == new_user.email)).first()
+    existing_user = session.exec(select(User).where(User.email == user_create.email)).first()
     if existing_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already in use")
-    session.add(new_user)
+    hashed_password = bcrypt.hashpw(user_create.password.encode("utf-8"), bcrypt.gensalt())
+    user = User(**user_create.model_dump(), hashed_password=hashed_password)
+    session.add(user)
     session.commit()
-    session.refresh(new_user)
-    return new_user
+    session.refresh(user)
+    return user
 
 
 @app.get("/users", response_model=list[UserPublic])
