@@ -23,11 +23,7 @@ class Task(TaskBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=get_current_utc_time)
-    updated_at: datetime
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.updated_at = self.created_at
+    updated_at: datetime | None = None
 
 
 class TaskCreate(TaskBase):
@@ -39,7 +35,7 @@ class TaskPublic(TaskBase):
     user_id: int
     status: Status
     created_at: datetime
-    updated_at: datetime
+    updated_at: datetime | None
 
 
 class TaskUpdate(SQLModel):

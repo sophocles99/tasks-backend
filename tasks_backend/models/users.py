@@ -17,12 +17,8 @@ class User(UserBase, table=True):
     email: EmailStr = Field(unique=True)
     hashed_password: bytes = Field(max_length=60)
     created_at: datetime = Field(default_factory=get_current_utc_time)
-    updated_at: datetime
+    updated_at: datetime | None = None
     last_login_at: datetime | None = None
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.updated_at = self.created_at
 
 
 class UserCreate(UserBase):
@@ -32,7 +28,7 @@ class UserCreate(UserBase):
 class UserPublic(UserBase):
     id: int
     created_at: datetime
-    updated_at: datetime
+    updated_at: datetime | None
     last_login_at: datetime | None
 
 

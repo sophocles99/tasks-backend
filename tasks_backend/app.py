@@ -31,7 +31,7 @@ def create_user(user_create: UserCreate, session: Session = Depends(get_session)
     if existing_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already in use")
     hashed_password = bcrypt.hashpw(user_create.password.encode("utf-8"), bcrypt.gensalt())
-    user = User(**user_create.model_dump(), hashed_password=hashed_password)
+    user = User.model_validate(user_create, update={"hashed_password": hashed_password})
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -72,7 +72,7 @@ def delete_user(user_id: int, session: Session = Depends(get_session)):
 @app.post("/tasks/{user_id}", response_model=TaskPublic)
 def create_task(task_create: TaskCreate, user_id: int, session: Session = Depends(get_session)):
     get_user_or_raise_404(user_id, session)
-    task = Task(**task_create.model_dump(), user_id=user_id)
+    task = Task.model_validate(task_create, update={"user_id": user_id})
     session.add(task)
     session.commit()
     session.refresh(task)
