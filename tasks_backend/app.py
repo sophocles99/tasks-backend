@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from typing import Generator
-
+from uuid import UUID
 import bcrypt
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlmodel import Session, select
@@ -45,13 +45,13 @@ def read_users(session: Session = Depends(get_session)):
 
 
 @app.get("/users/{user_id}", response_model=UserPublic)
-def read_user(user_id: int, session: Session = Depends(get_session)):
+def read_user(user_id: UUID, session: Session = Depends(get_session)):
     user = get_user_or_raise_404(user_id, session)
     return user
 
 
 @app.patch("/users/{user_id}", response_model=UserPublic)
-def update_user(user_id: int, user_update: UserUpdate, session: Session = Depends(get_session)):
+def update_user(user_id: UUID, user_update: UserUpdate, session: Session = Depends(get_session)):
     user = get_user_or_raise_404(user_id, session)
     user_update_data = user_update.model_dump(exclude_unset=True)
     user.sqlmodel_update(user_update_data)
@@ -62,7 +62,7 @@ def update_user(user_id: int, user_update: UserUpdate, session: Session = Depend
 
 
 @app.delete("/users/{user_id}")
-def delete_user(user_id: int, session: Session = Depends(get_session)):
+def delete_user(user_id: UUID, session: Session = Depends(get_session)):
     user = get_user_or_raise_404(user_id, session)
     session.delete(user)
     session.commit()
@@ -70,7 +70,7 @@ def delete_user(user_id: int, session: Session = Depends(get_session)):
 
 
 @app.post("/tasks/{user_id}", response_model=TaskPublic)
-def create_task(task_create: TaskCreate, user_id: int, session: Session = Depends(get_session)):
+def create_task(task_create: TaskCreate, user_id: UUID, session: Session = Depends(get_session)):
     get_user_or_raise_404(user_id, session)
     task = Task.model_validate(task_create, update={"user_id": user_id})
     session.add(task)
@@ -80,14 +80,14 @@ def create_task(task_create: TaskCreate, user_id: int, session: Session = Depend
 
 
 @app.get("/tasks/{user_id}", response_model=list[TaskPublic])
-def read_tasks(user_id: int, session: Session = Depends(get_session)):
+def read_tasks(user_id: UUID, session: Session = Depends(get_session)):
     get_user_or_raise_404(user_id, session)
     tasks = session.exec(select(Task).where(Task.user_id == user_id)).all()
     return tasks
 
 
 @app.get("/tasks/{user_id}/{task_id}", response_model=TaskPublic)
-def read_task(user_id: int, task_id: int, session: Session = Depends(get_session)):
+def read_task(user_id: UUID, task_id: UUID, session: Session = Depends(get_session)):
     get_user_or_raise_404(user_id, session)
     task = get_task_or_raise_404(user_id, task_id, session)
     return task
@@ -95,7 +95,7 @@ def read_task(user_id: int, task_id: int, session: Session = Depends(get_session
 
 @app.patch("/tasks/{user_id}/{task_id}", response_model=TaskPublic)
 def update_task(
-    user_id: int, task_id: int, task_update: TaskUpdate, session: Session = Depends(get_session)
+    user_id: UUID, task_id: UUID, task_update: TaskUpdate, session: Session = Depends(get_session)
 ):
     get_user_or_raise_404(user_id, session)
     task = get_task_or_raise_404(user_id, task_id, session)
@@ -108,7 +108,7 @@ def update_task(
 
 
 @app.delete("/tasks/{user_id}/{task_id}")
-def delete_task(user_id: int, task_id: int, session: Session = Depends(get_session)):
+def delete_task(user_id: UUID, task_id: UUID, session: Session = Depends(get_session)):
     get_user_or_raise_404(user_id, session)
     task = get_task_or_raise_404(user_id, task_id, session)
     session.delete(task)

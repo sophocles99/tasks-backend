@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID, uuid4
 
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel
@@ -13,7 +14,7 @@ class UserBase(SQLModel):
 
 
 class User(UserBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
     email: EmailStr = Field(unique=True)
     hashed_password: bytes = Field(max_length=60)
     created_at: datetime = Field(default_factory=get_current_utc_time)
@@ -26,7 +27,7 @@ class UserCreate(UserBase):
 
 
 class UserPublic(UserBase):
-    id: int
+    id: UUID
     created_at: datetime
     updated_at: datetime | None
     last_login_at: datetime | None

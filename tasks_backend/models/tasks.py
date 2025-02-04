@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from enum import Enum
+from uuid import UUID, uuid4
 
 from sqlmodel import Field, SQLModel
 
@@ -20,8 +21,8 @@ class TaskBase(SQLModel):
 
 
 class Task(TaskBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id")
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    user_id: UUID = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=get_current_utc_time)
     updated_at: datetime | None = None
 
@@ -31,8 +32,8 @@ class TaskCreate(TaskBase):
 
 
 class TaskPublic(TaskBase):
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     status: Status
     created_at: datetime
     updated_at: datetime | None
