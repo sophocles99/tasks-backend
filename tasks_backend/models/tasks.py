@@ -44,6 +44,7 @@ class TaskUpdate(SQLModel):
     description: str | None = Field(default=None, max_length=500)
     due_date: date | None = None
     status: Status | None = None
+    category_ids: list[UUID] | None = None
 
 
 class TaskPublic(TaskBase):

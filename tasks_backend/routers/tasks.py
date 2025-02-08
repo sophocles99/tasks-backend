@@ -13,6 +13,7 @@ from tasks_backend.models.tasks import (
     get_task_or_raise_404,
 )
 from tasks_backend.models.users import get_user_or_raise_404
+from tasks_backend.utils.utils import get_current_utc_time
 
 router = APIRouter(prefix="/tasks")
 
@@ -50,11 +51,18 @@ def update_task(
 ):
     get_user_or_raise_404(user_id, session)
     task = get_task_or_raise_404(user_id, task_id, session)
+    if task_update.category_ids:
+        categories = session.exec(
+            select(Category).where(Category.id.in_(task_update.category_ids))
+        ).all()
+        task.categories = categories
     task_update_data = task_update.model_dump(exclude_unset=True)
     task.sqlmodel_update(task_update_data)
+    task.updated_at = get_current_utc_time()
     session.add(task)
     session.commit()
     session.refresh(task)
+    print(task)
     return task
 
 
