@@ -1,7 +1,7 @@
 from enum import Enum
 from uuid import UUID, uuid4
 
-from sqlmodel import Field, Session, SQLModel, UniqueConstraint, select
+from sqlmodel import Field, Session, SQLModel, select
 
 
 class DefaultCategory(Enum):
@@ -17,9 +17,8 @@ class CategoryBase(SQLModel):
 
 
 class Category(CategoryBase, table=True):
-    __table_args__ = (UniqueConstraint("name", "user_id", name="unique_name_per_user_constraint"),)
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    user_id: UUID = Field(foreign_key="user.id")
+    user_id: UUID = Field(foreign_key="user.id", primary_key=True)
 
 
 class CategoryCreate(CategoryBase):
