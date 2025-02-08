@@ -1,7 +1,8 @@
 import os
+from typing import Generator
 
 from dotenv import load_dotenv
-from sqlmodel import SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine
 
 load_dotenv()
 
@@ -10,6 +11,11 @@ if not db_url:
     raise ValueError("Environment variable 'DB_URL' is not set.")
 
 engine = create_engine(db_url, echo=True)
+
+
+def get_session() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield session
 
 
 def create_tables():

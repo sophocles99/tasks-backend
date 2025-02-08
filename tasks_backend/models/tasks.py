@@ -2,7 +2,9 @@ from datetime import date, datetime
 from enum import Enum
 from uuid import UUID, uuid4
 
-from sqlmodel import Field, SQLModel
+from fastapi import HTTPException
+from sqlalchemy.exc import MultipleResultsFound, NoResultFound
+from sqlmodel import Field, Session, SQLModel, select
 
 from tasks_backend.utils.utils import get_current_utc_time
 
@@ -44,3 +46,13 @@ class TaskUpdate(SQLModel):
     description: str | None = Field(default=None, max_length=500)
     due_date: date | None = None
     status: Status | None = None
+
+
+def get_task_or_raise_404(user_id: UUID, task_id: UUID, session: Session) -> Task:
+    try:
+        task = session.exec(select(Task).where(Task.id == task_id, Task.user_id == user_id)).one()
+    except NoResultFound:
+        raise HTTPException(status_code=404, detail="Task not found")
+    except MultipleResultsFound:
+        raise HTTPException(status_code=404, detail="More than one task found")
+    return task

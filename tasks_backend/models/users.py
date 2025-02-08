@@ -1,8 +1,9 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
+from fastapi import HTTPException
 from pydantic import EmailStr
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Session, SQLModel
 
 from tasks_backend.utils.utils import get_current_utc_time
 
@@ -38,3 +39,10 @@ class UserUpdate(SQLModel):
     last_name: str | None = Field(default=None, min_length=2, max_length=50)
     email: EmailStr | None = None
     password: str | None = Field(default=None, min_length=8, max_length=50)
+
+
+def get_user_or_raise_404(user_id: UUID, session: Session) -> User:
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
