@@ -2,6 +2,8 @@ from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
+from fastapi import HTTPException
+from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlmodel import Field, Relationship, Session, SQLModel, select
 
 from tasks_backend.models.links import TaskCategoryLink
@@ -32,6 +34,10 @@ class CategoryCreate(CategoryBase):
     pass
 
 
+class CategoryUpdate(CategoryBase):
+    pass
+
+
 class CategoryPublic(CategoryBase):
     id: UUID
 
@@ -52,3 +58,15 @@ def restore_default_categories(user_id: UUID, session: Session):
         if not existing_default_category:
             session.add(Category(name=category.value, user_id=user_id))
     session.commit()
+
+
+def get_category_or_raise_404(user_id: UUID, category_id: UUID, session: Session):
+    try:
+        category = session.exec(
+            select(Category).where(Category.id == category_id, Category.user_id == user_id)
+        ).one()
+    except NoResultFound:
+        raise HTTPException(status_code=404, detail="Category not found")
+    except MultipleResultsFound:
+        raise HTTPException(status_code=404, detail="More than one category found")
+    return category
