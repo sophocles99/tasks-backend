@@ -1,12 +1,17 @@
 from datetime import date, datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
-from sqlmodel import Field, Session, SQLModel, select
+from sqlmodel import Field, Relationship, Session, SQLModel, select
 
+from tasks_backend.models.links import TaskCategoryLink
 from tasks_backend.utils.utils import get_current_utc_time
+
+if TYPE_CHECKING:
+    from tasks_backend.models.categories import Category
 
 
 class Status(Enum):
@@ -27,10 +32,18 @@ class Task(TaskBase, table=True):
     user_id: UUID = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=get_current_utc_time)
     updated_at: datetime | None = None
+    categories: list["Category"] = Relationship(back_populates="tasks", link_model=TaskCategoryLink)
 
 
 class TaskCreate(TaskBase):
-    pass
+    category_ids: list[UUID]
+
+
+class TaskUpdate(SQLModel):
+    name: str | None = Field(default=None, min_length=3, max_length=50)
+    description: str | None = Field(default=None, max_length=500)
+    due_date: date | None = None
+    status: Status | None = None
 
 
 class TaskPublic(TaskBase):
@@ -39,13 +52,6 @@ class TaskPublic(TaskBase):
     status: Status
     created_at: datetime
     updated_at: datetime | None
-
-
-class TaskUpdate(SQLModel):
-    name: str | None = Field(default=None, min_length=3, max_length=50)
-    description: str | None = Field(default=None, max_length=500)
-    due_date: date | None = None
-    status: Status | None = None
 
 
 def get_task_or_raise_404(user_id: UUID, task_id: UUID, session: Session) -> Task:

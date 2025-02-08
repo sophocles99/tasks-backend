@@ -1,7 +1,13 @@
 from enum import Enum
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlmodel import Field, Session, SQLModel, select
+from sqlmodel import Field, Relationship, Session, SQLModel, select
+
+from tasks_backend.models.links import TaskCategoryLink
+
+if TYPE_CHECKING:
+    from tasks_backend.models.tasks import Task
 
 
 class DefaultCategory(Enum):
@@ -17,12 +23,17 @@ class CategoryBase(SQLModel):
 
 
 class Category(CategoryBase, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True, unique=True)
     user_id: UUID = Field(foreign_key="user.id", primary_key=True)
+    tasks: list["Task"] = Relationship(back_populates="categories", link_model=TaskCategoryLink)
 
 
 class CategoryCreate(CategoryBase):
     pass
+
+
+class CategoryPublic(CategoryBase):
+    id: UUID
 
 
 def create_default_categories(user_id: UUID, session: Session):
