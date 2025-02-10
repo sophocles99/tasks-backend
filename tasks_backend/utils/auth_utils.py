@@ -57,7 +57,7 @@ def create_access_token(user: User) -> AccessTokenResponse:
     return AccessTokenResponse(access_token=access_token, token_type="bearer")
 
 
-def get_current_user(token: str = Depends(oauth2_schema), session: Session = Depends(get_session)):
+def get_current_user(token: str = Depends(oauth2_schema), session: Session = Depends(get_session)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
