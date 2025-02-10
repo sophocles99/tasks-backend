@@ -6,11 +6,11 @@ from sqlmodel import Session, SQLModel, create_engine
 
 load_dotenv()
 
-db_url = os.getenv("DB_URL", None)
-if not db_url:
+DB_URL = os.getenv("DB_URL", None)
+if not DB_URL:
     raise ValueError("Environment variable 'DB_URL' is not set.")
 
-engine = create_engine(db_url, echo=True)
+engine = create_engine(DB_URL, echo=True)
 
 
 def get_session() -> Generator[Session, None, None]:

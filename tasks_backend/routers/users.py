@@ -1,6 +1,5 @@
 from uuid import UUID
 
-import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 
@@ -13,6 +12,7 @@ from tasks_backend.models.users import (
     UserUpdate,
     get_user_or_raise_404,
 )
+from tasks_backend.utils.auth_utils import hash_password
 
 router = APIRouter(prefix="/users")
 
@@ -22,7 +22,7 @@ def create_user(user_create: UserCreate, session: Session = Depends(get_session)
     existing_user = session.exec(select(User).where(User.email == user_create.email)).first()
     if existing_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already in use")
-    hashed_password = bcrypt.hashpw(user_create.password.encode("utf-8"), bcrypt.gensalt())
+    hashed_password = hash_password(user_create.password)
     user = User.model_validate(user_create, update={"hashed_password": hashed_password})
     session.add(user)
     session.commit()

@@ -12,7 +12,8 @@ from tasks_backend.models.tasks import (
     TaskUpdate,
     get_task_or_raise_404,
 )
-from tasks_backend.models.users import get_user_or_raise_404
+from tasks_backend.models.users import User, get_user_or_raise_404
+from tasks_backend.utils.auth_utils import get_current_user
 from tasks_backend.utils.utils import get_current_utc_time
 
 router = APIRouter(prefix="/tasks")
@@ -32,7 +33,12 @@ def create_task(task_create: TaskCreate, user_id: UUID, session: Session = Depen
 
 
 @router.get("/{user_id}", response_model=list[TaskPublicWithCategories])
-def read_tasks(user_id: UUID, session: Session = Depends(get_session)):
+def read_tasks(
+    user_id: UUID,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    print(f"current_user: {current_user}")
     get_user_or_raise_404(user_id, session)
     tasks = session.exec(select(Task).where(Task.user_id == user_id)).all()
     return tasks
