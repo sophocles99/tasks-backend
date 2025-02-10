@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from pydantic import EmailStr
 from sqlmodel import Field, Session, SQLModel
 
@@ -44,5 +44,5 @@ class UserUpdate(SQLModel):
 def get_user_or_raise_404(user_id: UUID, session: Session) -> User:
     user = session.get(User, user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user

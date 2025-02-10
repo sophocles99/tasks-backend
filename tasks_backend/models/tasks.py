@@ -3,7 +3,7 @@ from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlmodel import Field, Relationship, Session, SQLModel, select
 
@@ -59,7 +59,9 @@ def get_task_or_raise_404(user_id: UUID, task_id: UUID, session: Session) -> Tas
     try:
         task = session.exec(select(Task).where(Task.id == task_id, Task.user_id == user_id)).one()
     except NoResultFound:
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
     except MultipleResultsFound:
-        raise HTTPException(status_code=404, detail="More than one task found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="More than one task found"
+        )
     return task
