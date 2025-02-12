@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
 from tasks_backend.db import get_session
-from tasks_backend.utils.auth_utils import (
+from tasks_backend.auth import (
     AccessTokenResponse,
     authenticate_user,
     create_access_token,

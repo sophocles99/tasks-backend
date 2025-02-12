@@ -4,12 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 
 from tasks_backend.db import get_session
-from tasks_backend.models.categories import (
-    Category,
-    CategoryCreate,
-    CategoryUpdate,
-    get_category_or_raise_404,
-)
+from tasks_backend.models.categories import Category, CategoryCreate, CategoryUpdate, get_category_or_raise_404
 from tasks_backend.models.public import CategoryPublicWithTasks
 from tasks_backend.models.users import get_user_or_raise_404
 
@@ -17,9 +12,7 @@ router = APIRouter(prefix="/categories")
 
 
 @router.post("/{user_id}", response_model=CategoryPublicWithTasks)
-def create_category(
-    user_id: UUID, category_create: CategoryCreate, session: Session = Depends(get_session)
-):
+def create_category(user_id: UUID, category_create: CategoryCreate, session: Session = Depends(get_session)):
     get_user_or_raise_404(user_id, session)
     category = Category.model_validate(category_create, update={"user_id": user_id})
     session.add(category)

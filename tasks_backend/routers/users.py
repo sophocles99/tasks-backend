@@ -3,16 +3,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 
+from tasks_backend.auth import hash_password
 from tasks_backend.db import get_session
 from tasks_backend.models.categories import create_default_categories
-from tasks_backend.models.users import (
-    User,
-    UserCreate,
-    UserPublic,
-    UserUpdate,
-    get_user_or_raise_404,
-)
-from tasks_backend.utils.auth_utils import hash_password
+from tasks_backend.models.users import User, UserCreate, UserPublic, UserUpdate, get_user_or_raise_404
 
 router = APIRouter(prefix="/users")
 
