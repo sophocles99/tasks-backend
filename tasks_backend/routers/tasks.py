@@ -18,7 +18,9 @@ router = APIRouter(prefix="/tasks")
 def create_task(
     task_create: TaskCreate, current_user: User = Depends(get_current_user), session: Session = Depends(get_session)
 ):
-    categories = session.exec(select(Category).where(Category.id.in_(task_create.category_ids))).all()
+    categories = session.exec(
+        select(Category).where(Category.user_id == current_user, Category.id.in_(task_create.category_ids))
+    ).all()
     task = Task.model_validate(task_create, update={"categories": categories, "user_id": current_user.id})
     session.add(task)
     session.commit()
