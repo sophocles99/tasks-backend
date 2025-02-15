@@ -9,7 +9,7 @@ dependencies = [
     "bcrypt==4.2.1",
     "fastapi[standard]>=0.115.6",
     "passlib==1.7.4",
-    "psycopg2>=2.9.10",
+    "psycopg2-binary>=2.9.10",  # Using binary to solve libpq-dev dependency in AWS lambda
     "pyjwt==2.10.1",
     "python-dotenv>=1.0.1",
     "sqlmodel>=0.0.22"
@@ -25,3 +25,6 @@ dev = [
 
 [project.scripts]
 run = "tasks_backend.run:run_server"
+
+[tool.setuptools]
+packages = ["tasks_backend"]

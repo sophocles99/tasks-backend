@@ -18,3 +18,9 @@ app.include_router(auth.router)
 app.include_router(categories.router)
 app.include_router(tasks.router)
 app.include_router(users.router)
+
+
+def lambda_handler(event, context):
+    print(event)
+    print(context)
+    return 0

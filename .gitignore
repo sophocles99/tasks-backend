@@ -1,4 +1,9 @@
 .ruff_cache
 __pycache__
 *.egg-info
+
 .env
+
+dist
+.aws-sam
+deployment/requirements.txt
