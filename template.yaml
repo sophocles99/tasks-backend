@@ -3,7 +3,7 @@ Transform: 'AWS::Serverless-2016-10-31'
 
 Globals:
   Function:
-    CodeUri: ./deployment/lambda-requirements
+    CodeUri: ./deployment/requirements
     Runtime: python3.13
     MemorySize: 128
     Timeout: 10
