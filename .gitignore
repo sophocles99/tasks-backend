@@ -4,6 +4,6 @@ __pycache__
 
 .env
 
-dist
-.aws-sam
-deployment/requirements.txt
+build
+deployment/.aws-sam
+deployment/lambda-requirements

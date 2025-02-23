@@ -3,7 +3,7 @@ Transform: 'AWS::Serverless-2016-10-31'
 
 Globals:
   Function:
-    CodeUri: ./tasks_backend
+    CodeUri: ./deployment/lambda-requirements
     Runtime: python3.13
     MemorySize: 128
     Timeout: 10
@@ -11,7 +11,7 @@ Globals:
       LogGroup: !Sub /aws/lambda/${AWS::StackName}
       LogFormat: JSON
     Architectures:
-      - arm64
+      - x86_64
     Tags:
       project: "task-app"
 
@@ -89,7 +89,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       FunctionName: !Sub '${ProjectName}-function'
-      Handler: app.lambda_handler
+      Handler: tasks_backend/app.lambda_handler
       # Function environment variables
       Environment:
         Variables:

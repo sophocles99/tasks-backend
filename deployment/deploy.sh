@@ -2,18 +2,14 @@
 
 set -e
 
-PROJECT_ROOT=$(dirname "$(dirname "$(realpath "$0")")")
-DEPLOYMENT_DIR="$PROJECT_ROOT/deployment"
-PROJECT_SRC_DIR="$PROJECT_ROOT/tasks_backend"
+PROJECT_ROOT=$(dirname "$(dirname "$(readlink -f "$0")")")
+REQUIREMENTS_FILEPATH="lambda-requirements/requirements.txt"
 
-cd "$PROJECT_ROOT"
+cd "$PROJECT_ROOT/deployment"
 
 pip install pip-tools
-pip-compile ./pyproject.toml --output-file="$DEPLOYMENT_DIR/requirements.txt" --verbose
+pip-compile ../pyproject.toml --output-file="$REQUIREMENTS_FILEPATH" --verbose
+echo "$PROJECT_ROOT" >> "$REQUIREMENTS_FILEPATH"
 
-python -m build
-echo "$PROJECT_ROOT/dist/tasks_backend-0.1.0-py3-none-any.whl" >> "$DEPLOYMENT_DIR/requirements.txt"
-
-cd "$DEPLOYMENT_DIR"
-sam build --template "$PROJECT_ROOT/template.yaml"
+sam build --debug --template ../template.yaml
 sam deploy
