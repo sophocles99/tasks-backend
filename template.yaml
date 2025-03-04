@@ -10,8 +10,6 @@ Globals:
     LoggingConfig:
       LogGroup: !Sub /aws/lambda/${AWS::StackName}
       LogFormat: JSON
-    Architectures:
-      - x86_64
     Tags:
       project: "task-app"
 
@@ -104,7 +102,17 @@ Resources:
           - Effect: Allow
             Action: 'rds-data:ExecuteStatement'
             Resource: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
-
+      Events:
+        ApiEventRoot:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+        ApiEventProxy:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
 Outputs:
   DBClusterArn:
     Description: Aurora DB Cluster Resource ARN
