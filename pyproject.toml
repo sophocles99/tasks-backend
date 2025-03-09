@@ -21,11 +21,12 @@ requires-python = ">=3.13"
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.8.2"
+    "ruff>=0.8.2",
+    "boto3==1.37.5"
 ]
 
 [project.scripts]
 run = "tasks_backend.run:run_server"
 
 [tool.setuptools]
-packages = ["tasks_backend"]
+packages = ["tasks_backend", "tasks_backend.models", "tasks_backend.routers", "tasks_backend.utils"]
