@@ -6,7 +6,7 @@ Globals:
     CodeUri: ./deployment/requirements
     Runtime: python3.13
     MemorySize: 128
-    Timeout: 10
+    Timeout: 30
     LoggingConfig:
       LogGroup: !Sub /aws/lambda/${AWS::StackName}
       LogFormat: JSON
@@ -38,7 +38,85 @@ Parameters:
     ConstraintDescription: Must be between 2 to 16 alphanumeric characters.
 
 Resources:
-  # Secrets Manager secret
+
+  # VPC
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-VPC
+        - Key: project
+          Value: !Ref ProjectName
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-PrivateSubnet1
+        - Key: project
+          Value: !Ref ProjectName
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-PrivateSubnet2
+        - Key: project
+          Value: !Ref ProjectName
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: DB subnet group for Aurora cluster
+      DBSubnetGroupName: !Sub ${ProjectName}-db-subnet-group
+      SubnetIds: 
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags: 
+        - Key: project
+          Value: !Ref ProjectName
+
+  # Security groups
+  SharedSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Shared security group for Lambda and Aurora
+      VpcId: !Ref VPC
+      Tags:
+        - Key: project
+          Value: !Ref ProjectName
+  SharedSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SharedSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+      SourceSecurityGroupId: !Ref SharedSecurityGroup
+  SecretsManagerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Secrets Manager VPC Endpoint
+      VpcId: !Ref VPC
+  SecretsManagerSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecretsManagerSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      SourceSecurityGroupId: !Ref SharedSecurityGroup
+
+  # Secrets Manager secrets
   DBSecret:
     Type: 'AWS::SecretsManager::Secret'
     Properties:
@@ -51,27 +129,56 @@ Resources:
         SecretStringTemplate: !Sub '{"username": "${DBAdminUserName}"}'
         GenerateStringKey: password
         PasswordLength: 30
-        ExcludeCharacters: '"@/\'
+        ExcludeCharacters: ":/?#[]@!$&'()*+,;=%\"` {}<>\\"
+  JWTSecretKeySecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: !Sub '${ProjectName}-JWTSecretKeySecret'
+      Description: Auto-generated JWT secret key
+      Tags:
+        - Key: project
+          Value: !Ref ProjectName
+      GenerateSecretString:
+        SecretStringTemplate: '{}'
+        GenerateStringKey: jwt-secret-key
+        PasswordLength: 64
+
+  # Secrets Manager VPC Endpoint
+  SecretsManagerVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.secretsmanager"
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref SecretsManagerSecurityGroup
+      PrivateDnsEnabled: true
+
   # Aurora Serverless v2 DB Cluster with Data API
   AuroraCluster:
     Type: 'AWS::RDS::DBCluster'
     Properties:
-      Tags:
-        - Key: project
-          Value: !Ref ProjectName
-      DBClusterIdentifier: !Ref DBClusterName
-      MasterUsername: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:username}}'
-      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:password}}'
       DatabaseName: !Ref DatabaseName
+      DBClusterIdentifier: !Ref DBClusterName
+      DBSubnetGroupName: !Ref DBSubnetGroup
       Engine: aurora-postgresql
       EngineMode: provisioned
       EngineVersion: '16.6'
+      MasterUsername: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:password}}'
+      Port: 5432 # this should be the default anyway
       StorageEncrypted: true
-      # Enable the Data API for Aurora Serverless
-      EnableHttpEndpoint: true
       ServerlessV2ScalingConfiguration:
-        MinCapacity: 0 #auto-pause
+        MinCapacity: 0 # auto-pause
         MaxCapacity: 1
+      Tags:
+        - Key: project
+          Value: !Ref ProjectName
+      VpcSecurityGroupIds:
+        - !Ref SharedSecurityGroup
   AuroraInstance:
     Type: 'AWS::RDS::DBInstance'
     Properties:
@@ -82,6 +189,7 @@ Resources:
       DBInstanceClass: db.serverless
       DBClusterIdentifier: !Ref AuroraCluster
       PubliclyAccessible: false
+
   # Lambda Function - uses Globals to define additional configuration values
   LambdaFunction:
     Type: 'AWS::Serverless::Function'
@@ -91,17 +199,22 @@ Resources:
       # Function environment variables
       Environment:
         Variables:
-          DBClusterArn: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
+          DBClusterEndpoint: !GetAtt AuroraCluster.Endpoint.Address
           DBName: !Ref DatabaseName
-          SecretArn: !Ref DBSecret
+          DBSecretArn: !Ref DBSecret
+          JWTSecretKeySecretArn: !Ref JWTSecretKeySecret
       # Creates an IAM Role that defines the services the function can access and which actions the function can perform
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Ref DBSecret
-        - Statement:
-          - Effect: Allow
-            Action: 'rds-data:ExecuteStatement'
-            Resource: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref JWTSecretKeySecret
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref SharedSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
       Events:
         ApiEventRoot:
           Type: Api
@@ -113,10 +226,8 @@ Resources:
           Properties:
             Path: /{proxy+}
             Method: ANY
+
 Outputs:
-  DBClusterArn:
-    Description: Aurora DB Cluster Resource ARN
-    Value: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
   DBClusterEndpoint:
     Description: Aurora DB Cluster Endpoint Address
     Value: !GetAtt AuroraCluster.Endpoint.Address
@@ -126,6 +237,9 @@ Outputs:
   DBAdminUserName:
     Description: Aurora Database Admin User
     Value: !Ref DBAdminUserName
-  SecretArn:
-    Description: Secrets Manager Secret ARN
+  DBSecretArn:
+    Description: Secrets Manager DBSecret ARN
     Value: !Ref DBSecret
+  JWTSecretKeySecretArn:
+    Description: Secrets Manager JWTSecretKeySecretArn
+    Value: !Ref JWTSecretKeySecret
