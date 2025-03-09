@@ -1,4 +1,3 @@
-import os
 from datetime import timedelta
 from uuid import UUID
 
@@ -13,13 +12,12 @@ from sqlmodel import Session, select
 
 from tasks_backend.db import get_session
 from tasks_backend.models.users import User
+from tasks_backend.utils.get_jwt_secret_key import get_jwt_secret_key
 from tasks_backend.utils.utils import get_current_utc_time
 
 DEFAULT_ACCESS_TOKEN_EXPIRY_MINUTES = 30
 JWT_ALGORITHM = "HS256"
-JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
-if not JWT_SECRET_KEY:
-    raise ValueError("Environment variable 'JWT_SECRET_KEY' is not set.")
+JWT_SECRET_KEY = get_jwt_secret_key()
 
 
 class AccessTokenResponse(BaseModel):
