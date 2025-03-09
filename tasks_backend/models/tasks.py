@@ -61,7 +61,5 @@ def get_task_or_raise_404(user_id: UUID, task_id: UUID, session: Session) -> Tas
     except NoResultFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
     except MultipleResultsFound:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="More than one task found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="More than one task found")
     return task
