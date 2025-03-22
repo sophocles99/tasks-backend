@@ -1,4 +1,5 @@
-from enum import Enum
+import sys
+from enum import StrEnum
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from tasks_backend.models.tasks import Task
 
 
-class DefaultCategory(Enum):
+class DefaultCategory(StrEnum):
     FINANCIAL = "financial"
     HEALTH = "health"
     HOME = "home"
@@ -20,8 +21,18 @@ class DefaultCategory(Enum):
     WORK = "work"
 
 
+DEFAULT_COLOURS: dict[DefaultCategory, int] = {
+    DefaultCategory.FINANCIAL: 0x66BB6A,
+    DefaultCategory.HEALTH: 0x03A9F4,
+    DefaultCategory.HOME: 0xFF9800,
+    DefaultCategory.PERSONAL: 0xFFEB3B,
+    DefaultCategory.WORK: 0xEC05FF,
+}
+
+
 class CategoryBase(SQLModel):
     name: str = Field(min_length=3, max_length=20)
+    colour: int = Field(ge=0, le=0xFFFFFF)
 
 
 class Category(CategoryBase, table=True):
@@ -35,7 +46,8 @@ class CategoryCreate(CategoryBase):
 
 
 class CategoryUpdate(CategoryBase):
-    pass
+    name: str | None = Field(default=None, min_length=3, max_length=20)
+    colour: int | None = Field(default=None, ge=0, le=0xFFFFFF)
 
 
 class CategoryPublic(CategoryBase):
@@ -43,7 +55,9 @@ class CategoryPublic(CategoryBase):
 
 
 def create_default_categories(user_id: UUID, session: Session):
-    default_categories = [Category(name=category.value, user_id=user_id) for category in DefaultCategory]
+    default_categories = [
+        Category(name=category.value, user_id=user_id, colour=DEFAULT_COLOURS[category]) for category in DefaultCategory
+    ]
     session.add_all(default_categories)
     session.commit()
 
