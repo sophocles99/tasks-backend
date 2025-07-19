@@ -17,7 +17,6 @@ from tasks_backend.utils.utils import get_current_utc_time
 
 DEFAULT_ACCESS_TOKEN_EXPIRY_MINUTES = 30
 JWT_ALGORITHM = "HS256"
-JWT_SECRET_KEY = get_jwt_secret_key()
 
 
 class AccessTokenResponse(BaseModel):
@@ -51,7 +50,7 @@ def create_access_token(user: User) -> AccessTokenResponse:
     current_utc_time = get_current_utc_time()
     expiry_time = current_utc_time + timedelta(minutes=DEFAULT_ACCESS_TOKEN_EXPIRY_MINUTES)
     access_token_payload = {"sub": user_id_jsonable, "exp": expiry_time}
-    access_token = jwt.encode(access_token_payload, JWT_SECRET_KEY, JWT_ALGORITHM)
+    access_token = jwt.encode(access_token_payload, get_jwt_secret_key(), JWT_ALGORITHM)
     return AccessTokenResponse(access_token=access_token, token_type="bearer")
 
 
@@ -62,7 +61,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Dep
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, [JWT_ALGORITHM])
+        payload = jwt.decode(token, get_jwt_secret_key(), [JWT_ALGORITHM])
         user_id = payload.get("sub")
         if user_id is None:
             raise credentials_exception

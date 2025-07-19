@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from functools import lru_cache
 
 import boto3
 from botocore.exceptions import ClientError
@@ -8,6 +9,7 @@ from botocore.exceptions import ClientError
 from tasks_backend.utils.utils import get_env_var
 
 
+@lru_cache()
 def get_jwt_secret_key():
     if "AWS_LAMBDA_FUNCTION_NAME" in os.environ:
         secrets_client = boto3.client("secretsmanager")
