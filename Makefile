@@ -1,15 +1,25 @@
 .PHONY: all format install uninstall
 
+VENV_DIR := .venv
+
 all: format
 
 format:
 	ruff check --fix .
 	ruff format .
 
-install:
-	python -m pip install --upgrade pip
-	pip install -e '.[dev]'
+install: venv
+	uv pip install -e '.[dev]'
 
 uninstall:
-	pip uninstall -y tasks-backend
-	pip freeze | xargs pip uninstall -y
+	uv pip uninstall -y tasks-backend
+	uv pip freeze | xargs uv pip uninstall -y
+
+venv:
+	@if [ ! -f "$(VENV_DIR)/pyvenv.cfg" ]; then \
+		echo "Creating new virtual environment..."; \
+		uv venv $(VENV_DIR); \
+		echo "Virtual environment created in $(VENV_DIR)"; \
+	else \
+		echo "Virtual environment found in $(VENV_DIR)";\
+	fi
