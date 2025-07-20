@@ -13,7 +13,7 @@ router = APIRouter(prefix="/auth")
 def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)
 ) -> AccessTokenResponse:
-    user = authenticate_user(form_data.username, form_data.password, session)
+    user = authenticate_user(email=form_data.username, password=form_data.password, session=session)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

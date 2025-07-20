@@ -10,7 +10,7 @@ from tasks_backend.utils.utils import get_current_utc_time
 
 class UserBase(SQLModel):
     first_name: str | None = Field(default=None, min_length=2, max_length=50)
-    last_name: str = Field(min_length=2, max_length=50)
+    last_name: str | None = Field(default=None, min_length=2, max_length=50)
     email: EmailStr
 
 
