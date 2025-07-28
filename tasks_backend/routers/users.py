@@ -41,12 +41,6 @@ def create_user(user_create: UserCreate, session: Session = Depends(get_session)
     )
 
 
-@router.get("", response_model=list[UserPublic])
-def read_users(_=Depends(get_current_user), session: Session = Depends(get_session)):
-    users = session.exec(select(User)).all()
-    return users
-
-
 @router.get("", response_model=UserPublic)
 def read_user(current_user: User = Depends(get_current_user), session: Session = Depends(get_session)):
     return current_user
