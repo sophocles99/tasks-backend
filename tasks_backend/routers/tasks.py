@@ -6,7 +6,7 @@ from sqlmodel import Session, select
 from tasks_backend.auth import get_current_user
 from tasks_backend.db import get_session
 from tasks_backend.models.categories import Category
-from tasks_backend.models.public import TaskPublicWithCategories
+from tasks_backend.models.shared import TaskPublicWithCategories
 from tasks_backend.models.tasks import Task, TaskCreate, TaskUpdate, get_task_or_raise_404
 from tasks_backend.models.users import User
 from tasks_backend.utils.utils import get_current_utc_time

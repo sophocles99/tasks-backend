@@ -3,16 +3,23 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 
-from tasks_backend.auth import get_current_user, hash_password
+from tasks_backend.auth import create_access_token, get_current_user, hash_password
 from tasks_backend.db import get_session
 from tasks_backend.models.categories import create_default_categories
-from tasks_backend.models.users import User, UserCreate, UserPublic, UserUpdate, get_user_or_raise_404
+from tasks_backend.models.users import (
+    User,
+    UserCreate,
+    UserCreateResponse,
+    UserPublic,
+    UserUpdate,
+    get_user_or_raise_404,
+)
 from tasks_backend.utils.utils import get_current_utc_time
 
 router = APIRouter(prefix="/users")
 
 
-@router.post("", response_model=UserPublic)
+@router.post("", response_model=UserCreateResponse)
 def create_user(user_create: UserCreate, session: Session = Depends(get_session)):
     existing_user = session.exec(select(User).where(User.email == user_create.email)).first()
     if existing_user:
@@ -23,7 +30,15 @@ def create_user(user_create: UserCreate, session: Session = Depends(get_session)
     session.commit()
     session.refresh(user)
     create_default_categories(user.id, session)
-    return user
+    access_token_response = create_access_token(user)
+    return UserCreateResponse(
+        access_token=access_token_response.access_token,
+        email=user.email,
+        first_name=user.first_name,
+        id=user.id,
+        last_name=user.last_name,
+        token_type=access_token_response.token_type,
+    )
 
 
 @router.get("", response_model=list[UserPublic])

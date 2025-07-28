@@ -7,21 +7,16 @@ from fastapi import Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
-from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from tasks_backend.db import get_session
+from tasks_backend.models.shared import AccessTokenResponse
 from tasks_backend.models.users import User
 from tasks_backend.utils.get_jwt_secret_key import get_jwt_secret_key
 from tasks_backend.utils.utils import get_current_utc_time
 
 DEFAULT_ACCESS_TOKEN_EXPIRY_MINUTES = 30
 JWT_ALGORITHM = "HS256"
-
-
-class AccessTokenResponse(BaseModel):
-    access_token: str
-    token_type: str
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")

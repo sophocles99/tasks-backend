@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from pydantic import EmailStr
 from sqlmodel import Field, Session, SQLModel
 
+from tasks_backend.auth import AccessTokenResponse
 from tasks_backend.utils.utils import get_current_utc_time
 
 
@@ -32,6 +33,10 @@ class UserPublic(UserBase):
     created_at: datetime
     updated_at: datetime | None
     last_login_at: datetime | None
+
+
+class UserCreateResponse(UserBase, AccessTokenResponse):
+    id: UUID
 
 
 class UserUpdate(SQLModel):
