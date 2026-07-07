@@ -8,6 +8,8 @@ from sqlmodel import Session, SQLModel, create_engine
 from tasks_backend.utils.get_db_url import get_db_url
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 load_dotenv()
 
 engine: Engine | None = None
@@ -31,5 +33,5 @@ def create_tables():
     engine = get_engine()
     # SQLModel.metadata.drop_all(engine)
     tables_list = ", ".join(table_name for table_name in SQLModel.metadata.tables)
-    logging.info(f"Creating tables {tables_list} from SQLModel metadata")
+    logger.info(f"Creating tables {tables_list} from SQLModel metadata")
     SQLModel.metadata.create_all(engine)
