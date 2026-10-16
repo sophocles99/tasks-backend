@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
-from tasks_backend.db import create_tables
+from tasks_backend.database.db import create_tables
 from tasks_backend.routers import auth, categories, tasks, users
 
 _invocation_count = 0

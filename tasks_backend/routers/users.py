@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 
 from tasks_backend.auth import create_access_token, get_current_user, hash_password
-from tasks_backend.db import get_session
+from tasks_backend.database.db import get_session
 from tasks_backend.models.categories import create_default_categories
 from tasks_backend.models.users import (
     User,

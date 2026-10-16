@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlmodel import Session, select
 
-from tasks_backend.db import get_session
+from tasks_backend.database.db import get_session
 from tasks_backend.models.shared import AccessTokenResponse
 from tasks_backend.models.users import User
 from tasks_backend.utils.get_jwt_secret_key import get_jwt_secret_key

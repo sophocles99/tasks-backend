@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 
 from tasks_backend.auth import get_current_user
-from tasks_backend.db import get_session
+from tasks_backend.database.db import get_session
 from tasks_backend.models.categories import Category, CategoryCreate, CategoryUpdate, get_category_or_raise_404
 from tasks_backend.models.shared import CategoryPublicWithTasks
 from tasks_backend.models.users import User
