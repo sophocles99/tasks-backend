@@ -27,6 +27,7 @@ dev = [
 
 [project.scripts]
 run = "tasks_backend.run:run_server"
+seed = "tasks_backend.database.seed:seed_database"
 
 [tool.setuptools]
 packages = ["tasks_backend", "tasks_backend.models", "tasks_backend.routers", "tasks_backend.utils"]

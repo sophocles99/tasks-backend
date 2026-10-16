@@ -1,0 +1,80 @@
+{
+  "user": {
+    "first_name": "Bobby",
+    "last_name": "Ball",
+    "email": "bobby.ball@example.com",
+    "password": "password123"
+  },
+  "tasks": [
+    {
+      "name": "Buy groceries",
+      "description": "Buy groceries for the week",
+      "due_date": "2026-06-30",
+      "status": "done",
+      "category": "home"
+    },
+    {
+      "name": "Pay quarterly taxes",
+      "description": "Submit estimated tax payment for Q1 before the deadline.",
+      "due_date": "2026-06-30",
+      "status": "done",
+      "category": "financial"
+    },
+    {
+      "name": "Morning jog",
+      "description": "Complete 30-minute run around the neighbourhood park.",
+      "due_date": "2026-06-30",
+      "status": "done",
+      "category": "health"
+    },
+    {
+      "name": "Fix leaky tap",
+      "description": "Replace washer in bathroom sink to stop the dripping.",
+      "due_date": "2026-07-01",
+      "status": "in_progress",
+      "category": "home"
+    },
+    {
+      "name": "Read new novel",
+      "description": "Finish first three chapters of the book club selection.",
+      "due_date": "2026-07-01",
+      "status": "in_progress",
+      "category": "personal"
+    },
+    {
+      "name": "Update project timeline",
+      "description": "Revise milestone dates based on recent progress and resource availability.",
+      "due_date": "2026-07-01",
+      "status": "in_progress",
+      "category": "work"
+    },
+    {
+      "name": "Review investment portfolio",
+      "description": "Check performance of shares and rebalance allocations if necessary.",
+      "due_date": "2026-07-31",
+      "status": "not_started",
+      "category": "financial"
+    },
+    {
+      "name": "Schedule dentist appointment",
+      "description": "Book six-month check-up and cleaning with Dr. Johnson.",
+      "due_date": "2026-07-31",
+      "status": "not_started",
+      "category": "health"
+    },
+    {
+      "name": "Organise garage storage",
+      "description": "Sort through boxes and donate unused items to charity.",
+      "due_date": "2026-07-31",
+      "status": "not_started",
+      "category": "home"
+    },
+    {
+      "name": "Renew passport",
+      "description": "Fill in the renewal form and get new photographs taken.",
+      "due_date": "2026-07-31",
+      "status": "not_started",
+      "category": null
+    }
+  ]
+}
