@@ -11,7 +11,3 @@ class AccessTokenResponse(BaseModel):
 
 class CategoryPublicWithTasks(CategoryPublic):
     tasks: list["TaskPublic"]
-
-
-class TaskPublicWithCategories(TaskPublic):
-    categories: list["CategoryPublic"]

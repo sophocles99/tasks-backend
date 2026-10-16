@@ -6,8 +6,6 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlmodel import Field, Relationship, Session, SQLModel, select
 
-from tasks_backend.models.links import TaskCategoryLink
-
 if TYPE_CHECKING:
     from tasks_backend.models.tasks import Task
 
@@ -37,7 +35,7 @@ class CategoryBase(SQLModel):
 class Category(CategoryBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True, unique=True)
     user_id: UUID = Field(foreign_key="user.id", primary_key=True)
-    tasks: list["Task"] = Relationship(back_populates="categories", link_model=TaskCategoryLink)
+    tasks: list["Task"] = Relationship(back_populates="category")
 
 
 class CategoryCreate(CategoryBase):
