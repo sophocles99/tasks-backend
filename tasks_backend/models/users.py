@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from pydantic import EmailStr
 from sqlmodel import Field, Session, SQLModel
 
-from tasks_backend.auth import AccessTokenResponse
+from tasks_backend.models.shared import AccessTokenResponse
 from tasks_backend.utils.utils import get_current_utc_time
 
 
