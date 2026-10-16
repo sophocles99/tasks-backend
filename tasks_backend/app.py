@@ -2,7 +2,7 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
@@ -33,7 +33,7 @@ app.add_middleware(
 
 
 @app.get("/")
-async def root(request: Request):
+async def root():
     logging.info("Running root operation function")
     if "AWS_LAMBDA_FUNCTION_NAME" in os.environ:
         message = (
