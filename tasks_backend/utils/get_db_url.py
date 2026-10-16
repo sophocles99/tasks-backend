@@ -28,7 +28,7 @@ def get_db_url() -> str:
         username, password = _get_db_credentials()
         db_host = get_env_var("DBClusterEndpoint")
         db_name = get_env_var("DBName")
-        db_url = f"postgresql://{username}:{password}@{db_host}/{db_name}"
+        db_url = f"postgresql+psycopg://{username}:{password}@{db_host}/{db_name}"
     else:
         db_url = get_env_var("DB_URL")
     logging.info(f"DB URL: {db_url}")

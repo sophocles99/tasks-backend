@@ -10,7 +10,7 @@ dependencies = [
     "fastapi[standard]>=0.115.6",
     "mangum>=0.19.0",
     "passlib==1.7.4",
-    "psycopg2-binary>=2.9.10",  # Using binary to solve libpq-dev dependency in AWS lambda
+    "psycopg[binary]>=3.2.0",  # Using binary to solve libpq-dev dependency in AWS lambda
     "pyjwt==2.10.1",
     "python-dotenv>=1.0.1",
     "sqlmodel>=0.0.22"
@@ -30,3 +30,7 @@ run = "tasks_backend.run:run_server"
 
 [tool.setuptools]
 packages = ["tasks_backend", "tasks_backend.models", "tasks_backend.routers", "tasks_backend.utils"]
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true
