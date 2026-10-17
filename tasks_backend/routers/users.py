@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session, select
+from fastapi import APIRouter, HTTPException, status
+from sqlmodel import select
 
-from tasks_backend.auth import create_access_token, get_current_user, hash_password
-from tasks_backend.database.db import get_session
+from tasks_backend.auth import create_access_token, hash_password
+from tasks_backend.dependencies import CurrentUserDependency, SessionDependency
 from tasks_backend.models.categories import create_default_categories
 from tasks_backend.models.users import (
     User,
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/users")
 
 
 @router.post("", response_model=UserCreateResponse)
-def create_user(user_create: UserCreate, session: Session = Depends(get_session)):
+def create_user(user_create: UserCreate, session: SessionDependency):
     existing_user = session.exec(select(User).where(User.email == user_create.email)).first()
     if existing_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already in use.")
@@ -42,14 +42,12 @@ def create_user(user_create: UserCreate, session: Session = Depends(get_session)
 
 
 @router.get("", response_model=UserPublic)
-def read_user(current_user: User = Depends(get_current_user), session: Session = Depends(get_session)):
+def read_user(current_user: CurrentUserDependency, session: SessionDependency):
     return current_user
 
 
 @router.patch("/{user_id}", response_model=UserPublic)
-def update_user(
-    user_update: UserUpdate, current_user: User = Depends(get_current_user), session: Session = Depends(get_session)
-):
+def update_user(user_update: UserUpdate, current_user: CurrentUserDependency, session: SessionDependency):
     user = current_user
     if user_update.password:
         user.hashed_password = hash_password(user_update.password)
@@ -63,7 +61,7 @@ def update_user(
 
 
 @router.delete("/{user_id}")
-def delete_user(user_id: UUID, session: Session = Depends(get_session)):
+def delete_user(user_id: UUID, session: SessionDependency):
     user = get_user_or_raise_404(user_id, session)
     session.delete(user)
     session.commit()

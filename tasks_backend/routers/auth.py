@@ -1,9 +1,10 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session
 
 from tasks_backend.auth import authenticate_user, create_access_token
-from tasks_backend.database.db import get_session
+from tasks_backend.dependencies import SessionDependency
 from tasks_backend.models.auth import LoginResponse
 from tasks_backend.utils.utils import get_current_utc_time
 
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/auth")
 
 @router.post("/login")
 def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDependency
 ) -> LoginResponse:
     user = authenticate_user(email=form_data.username, password=form_data.password, session=session)
     if not user:
