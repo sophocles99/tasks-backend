@@ -9,6 +9,9 @@ from mangum import Mangum
 from tasks_backend.database.db import create_tables
 from tasks_backend.routers import auth, categories, tasks, users
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 _invocation_count = 0
 
 
@@ -34,7 +37,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    logging.info("Running root operation function")
+    logger.info("Running root operation function")
     if "AWS_LAMBDA_FUNCTION_NAME" in os.environ:
         message = (
             f"FastAPI running on AWS Lambda in region {os.getenv('AWS_REGION')}, "
@@ -54,8 +57,8 @@ app.include_router(users.router)
 def lambda_handler(event, context):
     global _invocation_count
     _invocation_count += 1
-    logging.info(f"Invocation count: {_invocation_count}")
-    logging.info(event)
+    logger.info(f"Invocation count: {_invocation_count}")
+    logger.info(event)
     asgi_handler = Mangum(app, lifespan="auto")
     response = asgi_handler(event, context)
 

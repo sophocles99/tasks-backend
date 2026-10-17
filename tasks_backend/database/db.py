@@ -1,5 +1,5 @@
 import logging
-from typing import Generator
+from collections.abc import Generator
 
 from dotenv import load_dotenv
 from sqlalchemy.engine import Engine
@@ -7,7 +7,6 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from tasks_backend.utils.get_db_url import get_db_url
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
@@ -23,7 +22,7 @@ def get_engine():
     return engine
 
 
-def get_session() -> Generator[Session, None, None]:
+def get_session() -> Generator[Session]:
     engine = get_engine()
     with Session(engine) as session:
         yield session
