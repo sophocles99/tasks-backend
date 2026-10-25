@@ -1434,7 +1434,7 @@ dependencies = [
     { name = "sqlmodel" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "boto3" },
     { name = "ruff" },
@@ -1443,17 +1443,20 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "bcrypt", specifier = "==4.2.1" },
-    { name = "boto3", marker = "extra == 'dev'", specifier = "==1.37.5" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.6" },
     { name = "mangum", specifier = ">=0.19.0" },
     { name = "passlib", specifier = "==1.7.4" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2.0" },
     { name = "pyjwt", specifier = "==2.10.1" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8.2" },
     { name = "sqlmodel", specifier = ">=0.0.22" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "boto3", specifier = "==1.37.5" },
+    { name = "ruff", specifier = ">=0.8.2" },
+]
 
 [[package]]
 name = "typer"
