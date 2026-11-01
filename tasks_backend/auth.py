@@ -23,11 +23,11 @@ JWT_ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
-def hash_password(password: str) -> str:
+def hash_password(password: str) -> bytes:
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
 
-def verify_password(password: str, hashed_password: str):
+def verify_password(password: str, hashed_password: bytes):
     return bcrypt.checkpw(password.encode(), hashed_password)
 
 

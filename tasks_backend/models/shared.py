@@ -1,10 +1,11 @@
-from pydantic import BaseModel
+from sqlmodel import SQLModel
 
 from tasks_backend.models.categories import CategoryPublic
 from tasks_backend.models.tasks import TaskPublic
 
 
-class AccessTokenResponse(BaseModel):
+# Inherit from SQLModel to allow UserCreateResponse to inherit from both UserBase and AccessTokenResponse
+class AccessTokenResponse(SQLModel):
     access_token: str
     token_type: str
 

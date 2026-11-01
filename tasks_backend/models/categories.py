@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Annotated, Optional
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
@@ -28,9 +28,13 @@ DEFAULT_COLOURS: dict[DefaultCategory, int] = {
 }
 
 
+CategoryName = Annotated[str, Field(min_length=3, max_length=20)]
+CategoryColour = Annotated[int, Field(ge=0, le=0xFFFFFF)]
+
+
 class CategoryBase(SQLModel):
-    name: str = Field(min_length=3, max_length=20)
-    colour: int = Field(ge=0, le=0xFFFFFF)
+    name: CategoryName
+    colour: CategoryColour
 
 
 class Category(CategoryBase, table=True):
@@ -44,9 +48,9 @@ class CategoryCreate(CategoryBase):
     pass
 
 
-class CategoryUpdate(CategoryBase):
-    name: str | None = Field(default=None, min_length=3, max_length=20)
-    colour: int | None = Field(default=None, ge=0, le=0xFFFFFF)
+class CategoryUpdate(SQLModel):
+    name: CategoryName | None = None
+    colour: CategoryColour | None = None
 
 
 class CategoryPublic(CategoryBase):
@@ -65,7 +69,7 @@ def restore_default_categories(user_id: UUID, session: Session):
     for category in DefaultCategory:
         existing_default_category = session.exec(select(Category).where(Category.name == category.value))
         if not existing_default_category:
-            session.add(Category(name=category.value, user_id=user_id))
+            session.add(Category(colour=DEFAULT_COLOURS[category], name=category.value, user_id=user_id))
     session.commit()
 
 

@@ -3,7 +3,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlmodel import Field, Relationship, Session, SQLModel, select
 
@@ -25,7 +25,7 @@ class TaskBase(SQLModel):
     name: str = Field(min_length=3, max_length=50)
     description: str | None = Field(default=None, max_length=500)
     due_date: date | None = None
-    status: TaskStatus = Field(default=TaskStatus.NOT_STARTED)
+    status: TaskStatus
 
 
 class Task(TaskBase, table=True):
@@ -40,6 +40,7 @@ class Task(TaskBase, table=True):
 
 class TaskCreate(TaskBase):
     category_id: UUID | None = None
+    status: TaskStatus = TaskStatus.NOT_STARTED
 
 
 class TaskUpdate(SQLModel):
