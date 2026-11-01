@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import TYPE_CHECKING, Annotated, Optional
+from typing import TYPE_CHECKING, Annotated
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
