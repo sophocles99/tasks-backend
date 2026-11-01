@@ -1,14 +1,15 @@
 import json
 import logging
+from datetime import date
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from sqlmodel import Session, select
 
 from tasks_backend.auth import hash_password
-from tasks_backend.database.db import get_engine
+from tasks_backend.database.db import create_tables, get_engine
 from tasks_backend.models.categories import Category, create_default_categories
-from tasks_backend.models.tasks import Task, TaskBase
+from tasks_backend.models.tasks import Task, TaskStatus
 from tasks_backend.models.users import User, UserCreate
 
 SEED_DATA_FILEPATH = Path(__file__).parent / "seed-data.json"
@@ -18,9 +19,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class SeedTask(TaskBase):
+class SeedTask(BaseModel):
     model_config = ConfigDict(extra="forbid")
-
+    name: str = Field(min_length=3, max_length=50)
+    description: str | None = Field(default=None, max_length=500)
+    due_date: date | None = None
+    status: TaskStatus
     category: str | None = None
 
 
@@ -38,6 +42,8 @@ def load_seed_data() -> SeedData:
 
 
 def seed_database():
+    create_tables()
+
     seed_data = load_seed_data()
 
     user_create = seed_data.user
@@ -47,8 +53,9 @@ def seed_database():
     with Session(engine) as session:
         existing_user = session.exec(select(User).where(User.email == user_create.email)).first()
         if existing_user:
-            logger.warning(f"User with email address {user_create.email} already exists. Ending seeding process.")
-            return
+            session.delete(existing_user)
+            session.commit()
+            logger.warning(f"Existing seed user {existing_user.email} and data removed.")
 
         hashed_password = hash_password(user_create.password)
         user = User.model_validate(user_create, update={"hashed_password": hashed_password})
@@ -62,7 +69,7 @@ def seed_database():
 
         tasks: list[Task] = []
         for seed_task in seed_data.tasks:
-            category_id = user_category_ids_by_name.get(seed_task.category)
+            category_id = user_category_ids_by_name.get(seed_task.category) if seed_task.category else None
             task = Task.model_validate(
                 seed_task.model_dump(exclude={"category"}),
                 update={"user_id": user.id, "category_id": category_id},

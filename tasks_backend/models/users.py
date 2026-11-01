@@ -3,9 +3,11 @@ from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
 from pydantic import EmailStr
-from sqlmodel import Field, Session, SQLModel
+from sqlmodel import Field, Relationship, Session, SQLModel
 
+from tasks_backend.models.categories import Category
 from tasks_backend.models.shared import AccessTokenResponse
+from tasks_backend.models.tasks import Task
 from tasks_backend.utils.utils import get_current_utc_time
 
 
@@ -22,6 +24,8 @@ class User(UserBase, table=True):
     created_at: datetime = Field(default_factory=get_current_utc_time)
     updated_at: datetime | None = None
     last_login_at: datetime | None = None
+    categories: list["Category"] = Relationship(back_populates="user", cascade_delete=True)
+    tasks: list["Task"] = Relationship(back_populates="user", cascade_delete=True)
 
 
 class UserCreate(UserBase):

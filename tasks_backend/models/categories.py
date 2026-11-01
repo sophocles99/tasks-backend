@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
@@ -8,6 +8,7 @@ from sqlmodel import Field, Relationship, Session, SQLModel, select
 
 if TYPE_CHECKING:
     from tasks_backend.models.tasks import Task
+    from tasks_backend.models.users import User
 
 
 class DefaultCategory(StrEnum):
@@ -33,9 +34,10 @@ class CategoryBase(SQLModel):
 
 
 class Category(CategoryBase, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True, unique=True)
-    user_id: UUID = Field(foreign_key="user.id", primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True, ondelete="CASCADE")
     tasks: list["Task"] = Relationship(back_populates="category")
+    user: "User" = Relationship(back_populates="categories")
 
 
 class CategoryCreate(CategoryBase):

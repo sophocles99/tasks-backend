@@ -3,7 +3,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlmodel import Field, Relationship, Session, SQLModel, select
 
@@ -12,9 +12,10 @@ from tasks_backend.utils.utils import get_current_utc_time
 
 if TYPE_CHECKING:
     from tasks_backend.models.categories import Category
+    from tasks_backend.models.users import User
 
 
-class Status(Enum):
+class TaskStatus(Enum):
     NOT_STARTED = "not_started"
     IN_PROGRESS = "in_progress"
     DONE = "done"
@@ -24,16 +25,17 @@ class TaskBase(SQLModel):
     name: str = Field(min_length=3, max_length=50)
     description: str | None = Field(default=None, max_length=500)
     due_date: date | None = None
-    status: Status = Field(default=Status.NOT_STARTED)
+    status: TaskStatus = Field(default=TaskStatus.NOT_STARTED)
 
 
 class Task(TaskBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    user_id: UUID = Field(foreign_key="user.id")
+    user_id: UUID = Field(foreign_key="user.id", index=True, ondelete="CASCADE")
     created_at: datetime = Field(default_factory=get_current_utc_time)
     updated_at: datetime | None = None
-    category_id: UUID | None = Field(default=None, foreign_key="category.id")
+    category_id: UUID | None = Field(default=None, foreign_key="category.id", ondelete="SET NULL")
     category: Optional["Category"] = Relationship(back_populates="tasks")
+    user: "User" = Relationship(back_populates="tasks")
 
 
 class TaskCreate(TaskBase):
@@ -44,14 +46,14 @@ class TaskUpdate(SQLModel):
     name: str | None = Field(default=None, min_length=3, max_length=50)
     description: str | None = Field(default=None, max_length=500)
     due_date: date | None = None
-    status: Status | None = None
+    status: TaskStatus | None = None
     category_id: UUID | None = None
 
 
 class TaskPublic(TaskBase):
     id: UUID
     user_id: UUID
-    status: Status
+    status: TaskStatus
     created_at: datetime
     updated_at: datetime | None
     category: CategoryPublic | None = None

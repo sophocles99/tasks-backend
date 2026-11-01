@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from sqlalchemy.engine import Engine
 from sqlmodel import Session, SQLModel, create_engine
 
+# Import models to ensure they are registered with SQLModel metadata
+from tasks_backend.models import categories, tasks, users  # noqa: F401
 from tasks_backend.utils.get_db_url import get_db_url
 
 logger = logging.getLogger(__name__)
